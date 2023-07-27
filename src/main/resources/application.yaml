@@ -1,0 +1,12 @@
+jwt:
+  secret: fj38fj93jf83jg84hg84hg48hg84hg48jg84jg84jg48jg84jg84
+  lifetime: 30m
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/spring_security_db
+    username: root
+    password: admin
+  jpa:
+    hibernate.ddl-auto: update
+    generate-ddl: true
+    show-sql: true

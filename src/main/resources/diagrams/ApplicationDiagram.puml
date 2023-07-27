@@ -1,0 +1,31 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor Actor as A
+box Security
+participant "Token generator" as TG
+participant JwtRequestFilter as JRF
+participant Filter as F
+end box
+box Application
+participant Spring as S
+end box
+A->TG!!: not valid data
+TG-->A: HttpStatus: 401, Unauthorized
+A->TG++#11FF11: valid data
+note right: token start
+TG->A: token
+A->JRF: request + token
+JRF->F
+F->S
+S->F
+F->A
+A->JRF
+JRF->F!!
+F->A: HttpStatus: 403, Forbidden
+TG->A--:deactivate
+note right:end of token
+
+@enduml
