@@ -7,7 +7,6 @@ import com.epam.esm.springsecuritydemo.entity.User;
 import com.epam.esm.springsecuritydemo.exceptions.NotFoundException;
 import com.epam.esm.springsecuritydemo.repository.impl.UserRepositoryImpl;
 import com.epam.esm.springsecuritydemo.service.UserService;
-import com.epam.esm.springsecuritydemo.service.mapper.UserMapper;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,13 +25,11 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepositoryImpl userRepository;
     private final RoleServiceImpl roleService;
-    private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepositoryImpl userRepository, RoleServiceImpl roleService, UserMapper userMapper) {
+    public UserServiceImpl(UserRepositoryImpl userRepository, RoleServiceImpl roleService) {
         this.userRepository = userRepository;
         this.roleService = roleService;
-        this.userMapper = userMapper;
     }
 
     @Override
@@ -62,17 +59,24 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserDto save(UserDto userDto) {
-        User user = userMapper.mapDtoToEntity(userDto);
+    public ResponseUserDto save(UserDto userDto) {
+        User user = User.builder()
+                .id(userDto.getId())
+                .username(userDto.getUsername())
+                .email(userDto.getEmail())
+                .password(userDto.getPassword())
+                .build();
         Set<Role> roles = Set.of(roleService.findByName("USER"));
         user.setRoles(roles);
         userRepository.save(user);
         User lastAdded = userRepository.findLastAdded().orElseThrow(() -> new NotFoundException("User not found"));
         lastAdded.setRoles(roles);
-        roles.forEach(role -> {
-            userRepository.saveUserRole(lastAdded.getId(), role.getId());
-        });
-        return userMapper.mapEntityToDto(lastAdded);
+        roles.forEach(role -> userRepository.saveUserRole(lastAdded.getId(), role.getId()));
+        return ResponseUserDto.builder()
+                .id(lastAdded.getId())
+                .username(lastAdded.getUsername())
+                .email(lastAdded.getEmail())
+                .build();
     }
 
     @Override

@@ -10,6 +10,6 @@ public interface UserService {
     ResponseUserDto findById(Integer id);
     Optional<User> findByUsername(String username);
 
-    UserDto save(UserDto userDto);
+    ResponseUserDto save(UserDto userDto);
 
 }

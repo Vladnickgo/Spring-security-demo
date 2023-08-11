@@ -57,11 +57,6 @@ public class AuthServiceImpl implements AuthService {
                 .email(registrationUserDto.getEmail())
                 .password(bCryptPasswordEncoder.encode(registrationUserDto.getPassword()))
                 .build();
-        UserDto savedUserDto = userService.save(userDto);
-        return ResponseUserDto.builder()
-                .id(savedUserDto.getId())
-                .username(savedUserDto.getUsername())
-                .email(savedUserDto.getEmail())
-                .build();
+        return userService.save(userDto);
     }
 }
